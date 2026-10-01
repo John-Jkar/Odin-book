@@ -100,7 +100,6 @@ jobs:
           PGUSER: postgres
           PGPASSWORD: postgres
           PGDATABASE: postgres
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
         run: bin/rails db:test:prepare test
 
   system-test:
