@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Odinbook" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Odinbook">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3b5bdb">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <% if user_signed_in? %>
+      <nav class="navbar">
+        <%= link_to root_path, class: "brand" do %>
+          <span class="brand-mark" aria-hidden="true">O</span>
+          <span>Odinbook</span>
+        <% end %>
+
+        <ul class="nav-links">
+          <li><%= nav_link_to "Feed", posts_path %></li>
+          <li><%= nav_link_to "For You", discover_path %></li>
+          <li>
+            <%= link_to users_path, class: "nav-link #{'active' if current_page?(users_path)}" do %>
+              Find People<% if pending_follow_request_count > 0 %>
+                <span class="badge badge-alert"><%= pending_follow_request_count %></span>
+              <% end %>
+            <% end %>
+          </li>
+        </ul>
+
+        <div class="nav-account">
+          <%= link_to user_path(current_user), class: "nav-username" do %>
+            <%= render "users/avatar", user: current_user, size: "xs" %>
+            <span><%= current_user.username %></span>
+          <% end %>
+
+          <%= link_to "Account", edit_user_registration_path, class: "nav-links-link" %>
+
+          <%= button_to "Log out", destroy_user_session_path,
+                method: :delete, class: "btn btn-ghost btn-small" %>
+        </div>
+      </nav>
+    <% end %>
+
+    <main class="container">
+      <% if notice.present? %>
+        <p class="flash flash-notice"><%= notice %></p>
+      <% end %>
+      <% if alert.present? %>
+        <p class="flash flash-alert"><%= alert %></p>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

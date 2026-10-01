@@ -1,0 +1,61 @@
+<% content_for :title, "Find People" %>
+
+<h1 class="page-title">Find People</h1>
+<p class="page-subtitle">
+  Send follow requests to connect. Requests stay pending until they're accepted.
+</p>
+
+<% if @users.any? %>
+  <ul class="card user-list card-list">
+    <% @users.each do |user| %>
+      <% incoming_request = @pending_received[user.id] %>
+      <li class="user-row">
+        <%= link_to user_path(user), "aria-label": user.username do %>
+          <%= render "users/avatar", user: user, size: "sm" %>
+        <% end %>
+
+        <div class="user-row-info">
+          <div class="user-row-name">
+            <%= link_to user.username, user_path(user) %>
+            <% if user.full_name.present? %>
+              <span class="badge"><%= user.full_name %></span>
+            <% end %>
+            <% if incoming_request %>
+              <span class="badge badge-warn">Wants to follow you</span>
+            <% end %>
+          </div>
+
+          <% if user.bio.present? %>
+            <div class="user-row-bio"><%= truncate(user.bio, length: 90) %></div>
+          <% end %>
+        </div>
+
+        <div class="user-row-actions">
+          <%# incoming_request is checked first: when we already follow someone
+              who requests us back, the request still needs answering. %>
+          <% if incoming_request %>
+            <%= button_to "Accept", user_follow_request_path(user, incoming_request),
+                  method: :patch, class: "btn btn-small" %>
+            <%= button_to "Decline", user_follow_request_path(user, incoming_request),
+                  method: :delete, class: "btn btn-ghost btn-small" %>
+          <% elsif current_user.following?(user) %>
+            <%= button_to "Following", user_follow_path(user), method: :delete,
+                  class: "btn btn-ghost btn-small" %>
+          <% elsif @pending_sent.key?(user.id) %>
+            <%= button_to "Cancel request", user_follow_path(user), method: :delete,
+                  class: "btn btn-ghost btn-small" %>
+          <% else %>
+            <%= button_to "Follow", user_follow_path(user), method: :post,
+                  class: "btn btn-small" %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="card empty-state">
+    <div class="empty-state-icon" aria-hidden="true">◎</div>
+    <div class="empty-state-title">Nobody else here yet</div>
+    <p>You're the first one on Odinbook. Invite someone!</p>
+  </div>
+<% end %>

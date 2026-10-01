@@ -1,0 +1,15 @@
+<% content_for :title, "For You" %>
+
+<h1 class="page-title">For You</h1>
+<p class="page-subtitle">Recent posts from everyone else on Odinbook.</p>
+
+<% if @posts.any? %>
+  <%= render partial: "posts/post", collection: @posts, as: :post %>
+<% else %>
+  <div class="card empty-state">
+    <div class="empty-state-icon" aria-hidden="true">◎</div>
+    <div class="empty-state-title">Nothing to show yet</div>
+    <p>Once other people start posting, their posts appear here.</p>
+    <p><%= link_to "Invite people to join →", users_path %></p>
+  </div>
+<% end %>

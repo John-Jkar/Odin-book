@@ -1,0 +1,20 @@
+# likes_count / comments_count are counter caches, which fixtures bypass.
+# They must be set explicitly to match the likes and comments below.
+
+alice_post:
+  content: Just finished the Odinbook models layer.
+  user: alice
+  likes_count: 2
+  comments_count: 1
+
+bob_post:
+  content: Selling cars, still cheaper than therapy.
+  user: bob
+  likes_count: 1
+  comments_count: 1
+
+carol_post:
+  content: New cat, same amount of chaos as usual.
+  user: carol
+  likes_count: 0
+  comments_count: 0

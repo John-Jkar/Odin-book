@@ -1,0 +1,22 @@
+<% content_for :title, "Feed" %>
+
+<h1 class="page-title">Feed</h1>
+<p class="page-subtitle">
+  Posts from you and the <%= pluralize(current_user.following.count, "person") %> you follow.
+</p>
+
+<%= render "posts/composer", post: @post %>
+
+<% if @posts.any? %>
+  <%= render partial: "posts/post", collection: @posts, as: :post %>
+<% else %>
+  <div class="card empty-state">
+    <div class="empty-state-icon" aria-hidden="true">✎</div>
+    <div class="empty-state-title">Your feed is empty</div>
+    <p>
+      Follow some people and their posts will show up here, or write the first
+      post above.
+    </p>
+    <p><%= link_to "Find people to follow →", users_path %></p>
+  </div>
+<% end %>

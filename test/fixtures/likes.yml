@@ -1,0 +1,11 @@
+carol_likes_alice_post:
+  user: carol
+  post: alice_post
+
+bob_likes_alice_post:
+  user: bob
+  post: alice_post
+
+alice_likes_bob_post:
+  user: alice
+  post: bob_post

@@ -1,0 +1,9 @@
+<% size ||= "sm" %>
+<% fallback = size == "xs" ? "?placeholder=identicon&d=mp" : "?placeholder=identicon&d=mp&s=#{{ "xs" => 40, "sm" => 80, "md" => 160, "lg" => 240 }[size] || 160}" %>
+
+<% if user.avatar.attached? %>
+  <%= image_tag user.avatar, class: "avatar avatar-#{size}", alt: "#{user.username}'s avatar" %>
+<% else %>
+  <%= image_tag "https://www.gravatar.com/avatar/#{Digest::MD5.hexdigest(user.email.to_s.downcase)}#{fallback}",
+        class: "avatar avatar-#{size}", alt: "#{user.username}'s avatar" %>
+<% end %>

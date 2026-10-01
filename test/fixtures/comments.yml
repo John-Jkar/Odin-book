@@ -1,0 +1,9 @@
+alice_on_bob:
+  content: Good luck on that sale today.
+  user: alice
+  post: bob_post
+
+bob_on_alice:
+  content: Models look clean, keep going.
+  user: bob
+  post: alice_post

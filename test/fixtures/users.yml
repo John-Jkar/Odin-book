@@ -1,0 +1,23 @@
+alice:
+  email: alice@example.com
+  username: alice
+  full_name: Alice Anderson
+  location: Portland, OR
+  bio: Backend developer, tea drinker.
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
+
+bob:
+  email: bob@example.com
+  username: bob
+  full_name: Bob Barker
+  location: Austin, TX
+  bio: I sell cars.
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
+
+carol:
+  email: carol@example.com
+  username: carol
+  full_name: Carol Chen
+  location: Brooklyn, NY
+  bio: Ruby and cats.
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>

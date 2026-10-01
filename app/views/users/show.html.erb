@@ -1,0 +1,74 @@
+<% content_for :title, @user.username %>
+
+<div class="card profile-header">
+  <%= render "users/avatar", user: @user, size: "lg" %>
+
+  <div class="profile-details">
+    <h1 class="page-title"><%= @user.username %></h1>
+
+    <% if @user.full_name.present? %>
+      <p class="muted mb-0"><%= @user.full_name %></p>
+    <% end %>
+
+    <p class="post-timestamp mb-0">
+      Joined <%= @user.created_at.strftime("%B %Y") %>
+    </p>
+
+    <div class="profile-stats">
+      <span><strong><%= @user.posts.count %></strong> <%= "post".pluralize(@user.posts.count) %></span>
+      <span><strong><%= @user.followers.count %></strong> <%= "follower".pluralize(@user.followers.count) %></span>
+      <span><strong><%= @user.following.count %></strong> following</span>
+    </div>
+
+    <% if @user.bio.present? %>
+      <p class="profile-bio"><%= @user.bio %></p>
+    <% end %>
+
+    <% if @user.location.present? %>
+      <p class="subtle mb-0 mt-16">◎ <%= @user.location %></p>
+    <% end %>
+
+    <%# website is validated to be an absolute http(s) URL by the User model. %>
+    <% if @user.website.present? && @user.website.match?(%r{\Ahttps?://}) %>
+      <p class="subtle mb-0">
+        <%= link_to @user.website, @user.website, rel: "noopener noreferrer nofollow" %>
+      </p>
+    <% end %>
+
+    <div class="profile-actions">
+      <% if @user == current_user %>
+        <%= link_to "Edit profile", edit_profile_path, class: "btn" %>
+      <%# incoming_request first: a mutual follow must still be answerable. %>
+      <% elsif @incoming_request %>
+        <%= button_to "Accept request",
+              user_follow_request_path(@user, @incoming_request),
+              method: :patch, class: "btn" %>
+        <%= button_to "Decline",
+              user_follow_request_path(@user, @incoming_request),
+              method: :delete, class: "btn btn-ghost" %>
+      <% elsif current_user.following?(@user) %>
+        <%= button_to "Following", user_follow_path(@user), method: :delete,
+              class: "btn btn-ghost" %>
+      <% elsif @pending_request %>
+        <%= button_to "Cancel request", user_follow_path(@user), method: :delete,
+              class: "btn btn-ghost" %>
+      <% else %>
+        <%= button_to "Follow", user_follow_path(@user), method: :post, class: "btn" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<h2 class="section-title">Posts</h2>
+
+<% if @posts.any? %>
+  <%= render partial: "posts/post", collection: @posts, as: :post %>
+<% else %>
+  <div class="card empty-state">
+    <div class="empty-state-icon" aria-hidden="true">✎</div>
+    <div class="empty-state-title">No posts yet</div>
+    <p>
+      <%= @user == current_user ? "You haven't posted anything yet." : "#{@user.username} hasn't posted anything yet." %>
+    </p>
+  </div>
+<% end %>

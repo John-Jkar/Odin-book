@@ -1,0 +1,74 @@
+<%# Text only for now; the 280 limit is enforced by Post's validation. %>
+<article class="card post" id="post-<%= post.id %>">
+  <header class="post-header">
+    <%= link_to user_path(post.user), "aria-label": post.user.username do %>
+      <%= render "users/avatar", user: post.user, size: "sm" %>
+    <% end %>
+
+    <div class="post-meta">
+      <%= link_to post.user.username, user_path(post.user), class: "post-author" %>
+      <span class="post-timestamp" title="<%= post.created_at.strftime("%d %B %Y at %H:%M") %>">
+        <%= short_time_ago(post.created_at) %>
+      </span>
+    </div>
+
+    <% if post.user == current_user %>
+      <%= button_to "Delete", post_path(post), method: :delete,
+            class: "btn btn-danger btn-small" %>
+    <% end %>
+  </header>
+
+  <p class="post-content"><%= post.content %></p>
+
+  <div class="post-actions">
+    <% if post.liked_by?(current_user) %>
+      <%= button_to "♥ Liked", post_like_path(post), method: :delete,
+            class: "like-button liked",
+            "aria-label": "Unlike this post" %>
+    <% else %>
+      <%= button_to "♡ Like", post_like_path(post), method: :post,
+            class: "like-button",
+            "aria-label": "Like this post" %>
+    <% end %>
+
+    <span class="like-count"><%= pluralize(post.likes_count, "like") %></span>
+
+    <a href="#comment-<%= post.id %>" class="comment-count-link">
+      <%= pluralize(post.comments_count, "comment") %>
+    </a>
+  </div>
+
+  <div id="comment-<%= post.id %>" class="comments">
+    <% post.comments.chronological.includes(:user).each do |comment| %>
+      <div class="comment">
+        <%= link_to user_path(comment.user), "aria-label": comment.user.username do %>
+          <%= render "users/avatar", user: comment.user, size: "xs" %>
+        <% end %>
+
+        <div class="comment-body">
+          <div class="comment-author">
+            <%= link_to comment.user.username, user_path(comment.user) %>
+          </div>
+          <p class="comment-content"><%= comment.content %></p>
+
+          <% if comment.user == current_user %>
+            <div class="comment-actions">
+              <%= button_to "Delete", comment_path(comment), method: :delete,
+                    class: "btn btn-danger btn-small",
+                    "aria-label": "Delete your comment" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= form_with model: [ post, Comment.new ], class: "comment-form" do |form| %>
+      <div class="field field-with-count">
+        <%= form.label :content, "Add a comment", class: "visually-hidden" %>
+        <%= form.text_area :content, maxlength: 280, rows: 2,
+              placeholder: "Write a comment..." %>
+      </div>
+      <%= form.submit "Comment", class: "btn btn-small" %>
+    <% end %>
+  </div>
+</article>

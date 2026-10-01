@@ -1,0 +1,64 @@
+<% content_for :title, "Edit Profile" %>
+
+<div class="card auth-card">
+  <h1 class="page-title">Edit Profile</h1>
+  <p class="page-subtitle">Your public details.</p>
+
+  <% if @user.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @user, url: profile_path, method: :patch do |form| %>
+    <div class="field">
+      <%= form.label :avatar %>
+      <div class="avatar-preview">
+        <%= render "users/avatar", user: @user, size: "md" %>
+        <span class="field-hint">PNG or JPG, up to 5 MB. Leave empty to keep
+          your current avatar.</span>
+      </div>
+      <%= form.file_field :avatar, accept: "image/*" %>
+    </div>
+
+    <div class="field">
+      <%= form.label :username %>
+      <%= form.text_field :username %>
+      <p class="field-hint">3–30 characters. Letters, numbers and underscores only.</p>
+    </div>
+
+    <div class="field">
+      <%= form.label :full_name, "Full name" %>
+      <%= form.text_field :full_name %>
+    </div>
+
+    <div class="field">
+      <%= form.label :location %>
+      <%= form.text_field :location %>
+    </div>
+
+    <div class="field">
+      <%= form.label :website %>
+      <%= form.text_field :website, placeholder: "https://example.com" %>
+      <p class="field-hint">Must start with http:// or https://</p>
+    </div>
+
+    <div class="field">
+      <%= form.label :birth_date, "Birth date" %>
+      <%= form.date_field :birth_date %>
+    </div>
+
+    <div class="field">
+      <%= form.label :bio %>
+      <%= form.text_area :bio, rows: 4, maxlength: 500,
+            placeholder: "Tell people a little about yourself" %>
+      <p class="field-hint">Up to 500 characters.</p>
+    </div>
+
+    <%= form.submit "Save changes", class: "btn btn-block" %>
+  <% end %>
+</div>

@@ -1,0 +1,14 @@
+alice_follows_bob:
+  follower: alice
+  following: bob
+  status: accepted
+
+bob_follows_alice:
+  follower: bob
+  following: alice
+  status: accepted
+
+carol_requests_alice:
+  follower: carol
+  following: alice
+  status: pending

@@ -1,0 +1,31 @@
+<div class="card post-composer">
+  <% if post.errors.any? %>
+    <div class="errors">
+      <ul>
+        <% post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: post, url: posts_path do |form| %>
+    <div class="composer-row">
+      <%= render "users/avatar", user: current_user, size: "sm" %>
+
+      <div class="composer-body">
+        <div class="field">
+          <%= form.label :content, "What's on your mind?",
+                class: "visually-hidden" %>
+          <%= form.text_area :content, maxlength: 280, rows: 3,
+                placeholder: "Share something with your followers..." %>
+        </div>
+
+        <div class="composer-footer">
+          <span class="composer-hint">Up to 280 characters</span>
+          <%= form.submit "Post", class: "btn" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
