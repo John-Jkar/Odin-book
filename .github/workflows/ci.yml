@@ -140,7 +140,7 @@ jobs:
           PGUSER: postgres
           PGPASSWORD: postgres
           PGDATABASE: postgres
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/odinbook_test
         run: bin/rails db:test:prepare test:system
 
       - name: Keep screenshots from failed system tests
