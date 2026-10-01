@@ -39,14 +39,22 @@ class SocialFlowTest < ApplicationSystemTestCase
     sign_in_as "bob"
     visit discover_path
 
+    post_selector = "#post-#{posts(:alice_post).id}"
+
     # bob already likes alice's post (fixture), which has 2 likes.
-    within "#post-#{posts(:alice_post).id}" do
+    within post_selector do
       assert_text "2 likes"
-
       click_button "♥ Liked"
-      assert_text "1 like"
+    end
 
+    # Reacquire the post after the DOM update and verify the like was removed.
+    within post_selector do
+      assert_text "1 like"
       click_button "♡ Like"
+    end
+
+    # Final verification after the second DOM update.
+    within post_selector do
       assert_text "2 likes"
     end
   end
