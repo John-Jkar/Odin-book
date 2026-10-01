@@ -68,25 +68,6 @@ The front end is a hand-rolled design system in `app/assets/stylesheets/applicat
 5. **Preview emails in development**
    Letter Opener opens welcome emails in your browser automatically. Ensure the development mailer settings are still enabled.
 
-## Testing
-
-Run the full test suite:
-```bash
-bin/rails test
-```
-
-Run only model tests:
-```bash
-bin/rails test test/models
-```
-
-Run only integration tests:
-```bash
-bin/rails test test/integration
-```
-
-The test suite includes unit tests for model validations/associations/counter caches and integration tests covering authentication, posts, likes, comments, follows, profiles, the discovery feed and page loading (117 tests, 458 assertions).
-
 ## Project notes
 
 - Follow requests default to `pending` and must be accepted (`status: accepted`) before they count as a mutual follow.
@@ -101,6 +82,18 @@ The test suite includes unit tests for model validations/associations/counter ca
 - Active Storage is configured for profile pictures; Gravatar is used as a clean fallback.
 - Profile websites are validated as absolute `http(s)` URLs, since they are rendered as link `href`s.
 
+## Testing
+
+- `bin/rails test` — 117 unit/integration tests.
+- `bin/rails test:system` — 12 browser-driven Capybara tests (sign up, sign in/out, posting, feed contents, For You, like/unlike, comment, follow request accept/decline, profile edit).
+- `bundle exec rubocop` — clean.
+
+System tests use headless Chrome. Set `CHROME_BINARY` if the browser installed on your machine does not match the `chromedriver` on your `PATH`:
+
+```bash
+CHROME_BINARY=/usr/bin/chromium bin/rails test:system
+```
+
 ## Deployment
 
 This app is configured for PostgreSQL and follows standard Rails 8 deployment practices (see `config/database.yml` and `config/environments/production.rb`).
@@ -112,5 +105,12 @@ This app is configured for PostgreSQL and follows standard Rails 8 deployment pr
 
 ## Security
 
-`bin/brakeman --no-pager` reports **0 errors**. It raises one weak-confidence warning for the profile website link; the risk is mitigated by the `User` model validating the value against `/\Ahttps?:\/\/\S+\z/` and the view additionally re-checking the scheme before rendering an `href`.
+`bin/brakeman --no-pager` reports **0 errors and 0 unignored warnings**, and exits 0 so CI fails on any new finding.
 
+One warning is acknowledged in `config/brakeman.ignore` (a JSON file of fingerprint-scoped entries, each with a written justification). It is the profile website link: the value is constrained to absolute `http(s)` URLs by the `User` model validation, the view re-checks the scheme, and the `href` is passed through `sanitize` — but Brakeman does not follow model validations, so it cannot see any of that. Because entries are fingerprint-scoped, any *different* finding still fails the build.
+
+To keep the ignore file honest:
+
+```bash
+bin/brakeman --no-pager --ensure-ignore-notes --ensure-no-obsolete-ignore-entries
+```

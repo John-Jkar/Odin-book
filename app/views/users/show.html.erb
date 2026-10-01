@@ -28,10 +28,12 @@
       <p class="subtle mb-0 mt-16">◎ <%= @user.location %></p>
     <% end %>
 
-    <%# website is validated to be an absolute http(s) URL by the User model. %>
+    <%# The User model only accepts absolute http(s) URLs. `sanitize` scrubs
+        any other protocol (e.g. javascript:) as a second layer of defence. %>
     <% if @user.website.present? && @user.website.match?(%r{\Ahttps?://}) %>
       <p class="subtle mb-0">
-        <%= link_to @user.website, @user.website, rel: "noopener noreferrer nofollow" %>
+        <%= link_to sanitize(@user.website), sanitize(@user.website),
+              rel: "noopener noreferrer nofollow" %>
       </p>
     <% end %>
 

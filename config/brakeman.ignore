@@ -1,0 +1,9 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "a259ba750471dd9a55b4a1027ba6efce235acd0d3770392f69732d79e405751b",
+      "check_name": "LinkToHref",
+      "note": "False positive. The profile website is rendered as a link href, but the value is constrained to absolute http(s) URLs three times over: (1) the User model validates it against /\\Ahttps?:\\/\\/\\S+\\z/, rejecting javascript:, data: and relative values at write time; (2) app/views/users/show.html.erb re-checks the scheme before rendering; (3) the href is passed through `sanitize`, which scrubs any non-http(s) protocol. Brakeman does not follow model validations, so it cannot see any of these. Regenerate with: bundle exec brakeman -I"
+    }
+  ]
+}
