@@ -1,5 +1,11 @@
 require "test_helper"
 
+# Capybara's default wait is 2s, which is tight for Turbo form submissions on a
+# loaded CI runner. These are timing-sensitive assertions about DOM state that
+# arrives asynchronously, so allow more headroom rather than assert instantly.
+Capybara.default_max_wait_time = Integer(ENV.fetch("CAPYBARA_WAIT", 15))
+Capybara.server = :puma, { Silent: true }
+
 # Registered explicitly (rather than using `driven_by :selenium, using:
 # :headless_chrome`) so the driver can use the `eager` page-load strategy.
 # Otherwise a slow or unreachable Gravatar request stalls page load and the
@@ -10,6 +16,7 @@ Capybara.register_driver :odinbook_headless_chrome do |app|
   options.add_argument("--no-sandbox")
   options.add_argument("--disable-dev-shm-usage")
   options.add_argument("--disable-gpu")
+  options.add_argument("--disable-search-engine-choice-screen")
   options.add_argument("--window-size=1400,1600")
   options.page_load_strategy = :eager
   # Lets a machine with a locally installed Chromium/chrome pair opt in when

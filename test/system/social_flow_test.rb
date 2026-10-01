@@ -63,7 +63,9 @@ class SocialFlowTest < ApplicationSystemTestCase
     sign_in_as "bob"
     visit discover_path
 
-    within "#post-#{posts(:carol_post).id}" do
+    # The comment submit redirects, replacing the post; assertions after the
+    # block stay outside it deliberately.
+    within find("#post-#{posts(:carol_post).id}") do
       fill_in "Add a comment", with: "Great cat story!"
       click_button "Comment"
     end
@@ -76,14 +78,17 @@ class SocialFlowTest < ApplicationSystemTestCase
     sign_in_as "alice"
     visit users_path
 
-    # carol requested alice, so her row offers Accept/Decline first.
+    # Accepting redirects and re-renders the list, so reacquire the row
+    # instead of asserting inside the pre-redirect scope.
     within find(".user-row", text: "carol") do
       assert_button "Accept"
       click_button "Accept"
+    end
+
+    within find(".user-row", text: "carol") do
       assert_button "Follow"
     end
 
-    # bob is followed already.
     within find(".user-row", text: "bob") do
       assert_button "Following"
     end
@@ -97,6 +102,9 @@ class SocialFlowTest < ApplicationSystemTestCase
 
     within find(".user-row", text: "carol") do
       click_button "Decline"
+    end
+
+    within find(".user-row", text: "carol") do
       assert_button "Follow"
     end
 
