@@ -1,10 +1,35 @@
 #!/usr/bin/env ruby
 require "fileutils"
+require "socket"
 
 APP_ROOT = File.expand_path("..", __dir__)
 
 def system!(*args)
   system(*args, exception: true)
+end
+
+# Fail with an explanation instead of a page of ActiveRecord backtraces when the
+# database is not reachable yet. bin/rails db:prepare would otherwise be the
+# first thing to touch the database and dump its connection error.
+def check_database_connection!
+  host = ENV.fetch("PGHOST", "localhost")
+  port = Integer(ENV.fetch("PGPORT", 5432))
+
+  Socket.tcp(host, port, connect_timeout: 2, &:close)
+rescue StandardError
+  STDOUT.flush
+  abort <<~MESSAGE
+    == Cannot reach PostgreSQL at #{host}:#{port} ==
+
+    Start PostgreSQL and run bin/setup again. For example:
+
+        docker start <your-postgres-container>   # if you use Docker
+        sudo systemctl start postgresql          # if you installed it natively
+
+    If your host, port, or credentials differ, export them first:
+
+        export PGHOST=localhost PGPORT=5432 PGUSER=postgres PGPASSWORD=postgres
+  MESSAGE
 end
 
 FileUtils.chdir APP_ROOT do
@@ -19,6 +44,9 @@ FileUtils.chdir APP_ROOT do
   # unless File.exist?("config/database.yml")
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"
   # end
+
+  puts "\n== Checking database connection =="
+  check_database_connection!
 
   puts "\n== Preparing database =="
   system! "bin/rails db:prepare"

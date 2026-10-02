@@ -96,6 +96,23 @@ Prerequisites: Ruby 3.3+ and a running PostgreSQL 14+.
 
    Letter Opener opens welcome emails in your browser automatically, so registering a new account pops open the email without sending anything. No SMTP credentials are needed locally.
 
+### Troubleshooting setup
+
+`bin/setup` checks that PostgreSQL is reachable before touching the database, and stops with a short message if it is not. If you hit something it does not cover:
+
+**`cannot drop the currently open database`** — `DATABASE_URL` is set and points at a maintenance database. Unset it, or point it at a real database name. See step 2.
+
+**`template database "template1" has a collation version mismatch`** — the PostgreSQL cluster was created against an older glibc than the one now installed, so creating databases fails. Fix the recorded version, then retry:
+
+```bash
+psql -U postgres -d postgres -c "ALTER DATABASE template1 REFRESH COLLATION VERSION;"
+psql -U postgres -d postgres -c "ALTER DATABASE postgres REFRESH COLLATION VERSION;"
+```
+
+If those databases contain data, run `REINDEX DATABASE <name>` afterwards as the PostgreSQL documentation recommends.
+
+**`role "postgres" does not exist`** — the role named in step 2 does not exist on your server. Docker containers created with a different `POSTGRES_USER` will not have it; either create it or export `PGUSER`/`PGPASSWORD` to match what you have.
+
 ## Verifying the build
 
 The fastest full check runs RuboCop, the gem and importmap audits, Brakeman, and the test suite:
