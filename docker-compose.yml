@@ -15,11 +15,14 @@
 #
 # The port on the right-hand side is always 5432: that is the port PostgreSQL
 # listens on inside the container.
+#
+# The service is deliberately not given a fixed container_name. Compose then
+# names it after the project (the clone's directory) as <project>-odinbook-pg-1,
+# so two clones on one machine do not fight over the name.
 
 services:
-  db:
+  odinbook-pg:
     image: postgres:16
-    container_name: odinbook-pg
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
