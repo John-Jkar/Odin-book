@@ -19,7 +19,7 @@ services:
     runtime: ruby
     plan: free
     buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec puma -C config/puma.rb"
+    startCommand: "./bin/render-start.sh"
     healthCheckPath: /up
     envVars:
       - key: RAILS_ENV
