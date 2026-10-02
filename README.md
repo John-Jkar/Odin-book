@@ -188,14 +188,51 @@ System tests need a browser. Set `CHROME_BINARY` if the browser installed on you
 CHROME_BINARY=/usr/bin/chromium bin/rails test:system
 ```
 
-## Deployment
+## Deployment on Render
 
-This app is configured for PostgreSQL and follows standard Rails 8 deployment practices (see `config/database.yml` and `config/environments/production.rb`).
+The repository ships a [Render Blueprint](render.yaml). To deploy:
 
-- Database: set `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` (or supply `DATABASE_URL`).
-- Mailer: configure a real SMTP provider via the standard `SMTP_ADDRESS` / `SMTP_PORT` / `SMTP_USER_NAME` / `SMTP_PASSWORD` variables, and set `config.action_mailer.raise_delivery_errors = true`.
-- Active Storage: for production, switch to a cloud service (e.g. `:amazon` in `config/storage.yml`) and provide its credentials.
-- Assets: run `bin/rails assets:precompile` as part of the release step.
+1. Push this repo to GitHub.
+2. In Render, choose **New + → Blueprint** and select the repository.
+3. Render reads `render.yaml`, creates a PostgreSQL database, and wires
+   `DATABASE_URL` into the web service automatically.
+4. Fill in the secret values Render prompts for (see below), then deploy.
+
+`bin/render-build.sh` runs `bundle install`, precompiles assets, and runs
+`db:prepare` (which creates and migrates the database on first boot).
+
+### Required secrets
+
+| Variable | Value |
+| --- | --- |
+| `RAILS_MASTER_KEY` | Contents of your local `config/master.key` (decrypts `config/credentials.yml.enc`). The app cannot boot without it. |
+| `APP_HOST` | Your Render hostname, e.g. `odinbook.onrender.com`, used in emails. |
+| `MAILER_FROM` | Sender address. With Gmail this must be the Gmail address itself. |
+| `SMTP_USER_NAME` | Full Gmail address. |
+| `SMTP_PASSWORD` | A Google **App Password** — not the account password. Requires 2FA on the Google account. |
+
+`SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_AUTHENTICATION` and `SMTP_STARTTLS` are
+already set in `render.yaml` for Gmail (`smtp.gmail.com:587`, STARTTLS).
+
+### Persistent picture storage
+
+Uploaded pictures use local disk storage. On Render's free plan the filesystem
+is ephemeral, so **uploads are lost on every deploy/restart**. To keep them,
+attach a persistent disk and point Active Storage at it:
+
+1. Uncomment the `disk:` block in `render.yaml`.
+2. Set `ACTIVE_STORAGE_LOCAL_ROOT` to the disk mount path (the blueprint uses
+   `/var/odinbook/storage`).
+
+Persistent disks require a paid instance type. A cloud object store
+(S3/R2/Spaces) can be added later via a service in `config/storage.yml`.
+
+### Deploying elsewhere
+
+Set `DATABASE_URL`, `RAILS_MASTER_KEY`, `APP_HOST`, the `SMTP_*` variables, and
+optionally `ACTIVE_STORAGE_LOCAL_ROOT`, then run
+`bin/rails assets:precompile && bin/rails db:prepare` and start Puma.
+
 
 ## Security
 

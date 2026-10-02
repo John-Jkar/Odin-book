@@ -1,0 +1,76 @@
+# Render Blueprint for Odinbook.
+#
+# Deploy: push this repo to GitHub, then in the Render dashboard choose
+# "New +" -> "Blueprint" and point it at the repository. Render creates the
+# Postgres database and the web service, and wires DATABASE_URL automatically.
+#
+# Values marked `sync: false` are secrets you enter in the Render dashboard;
+# they are not stored in this file.
+
+databases:
+  - name: odinbook-db
+    databaseName: odinbook_production
+    user: odinbook
+    plan: free
+
+services:
+  - type: web
+    name: odinbook
+    runtime: ruby
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "bundle exec puma -C config/puma.rb"
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+
+      # Decrypts config/credentials.yml.enc. Paste the contents of your local
+      # config/master.key. Without this the app cannot boot in production.
+      - key: RAILS_MASTER_KEY
+        sync: false
+
+      # Supplied by the database above.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: odinbook-db
+          property: connectionString
+
+      # The public hostname of the web service, used for links in emails.
+      # Render sets RENDER_EXTERNAL_HOSTNAME too, so this can be set to
+      # whatever your onrender.com URL is.
+      - key: APP_HOST
+        sync: false
+
+      # Sender address for outgoing mail. With Gmail this must be the Gmail
+      # address itself, or the message is rejected.
+      - key: MAILER_FROM
+        sync: false
+
+      # Gmail SMTP. SMTP_PASSWORD must be a Google "App Password" (requires
+      # 2FA on the account), not the normal account password.
+      - key: SMTP_ADDRESS
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_AUTHENTICATION
+        value: plain
+      - key: SMTP_STARTTLS
+        value: "true"
+      - key: SMTP_USER_NAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+
+    # Optional: uncomment to keep uploaded pictures across deploys. Render
+    # persistent disks require a paid instance type. Mount the disk, set
+    # ACTIVE_STORAGE_LOCAL_ROOT to the mount path, and picture posts survive
+    # redeploys (otherwise uploaded files are wiped on every deploy).
+    #
+    # disk:
+    #   name: odinbook-storage
+    #   mountPath: /var/odinbook/storage
+    #   sizeGB: 1
+    # envVars:
+    #   - key: ACTIVE_STORAGE_LOCAL_ROOT
+    #     value: /var/odinbook/storage
