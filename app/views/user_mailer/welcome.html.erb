@@ -1,9 +1,20 @@
-<h1>Welcome to Odinbook, <%= @user.username %>!</h1>
+<h1 style="margin:0 0 12px;font-size:22px;font-weight:800;letter-spacing:-0.02em;">
+  Welcome to Odinbook, <%= @user.username %>!
+</h1>
 
-<p>
-  Thanks for signing up. Your profile is ready —
-  <%= link_to "go set it up", edit_profile_url %> and start following people to
-  build your feed.
+<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#131722;">
+  Thanks for signing up. Your profile is ready — add a picture, write a bio,
+  and start following people to build your feed.
 </p>
 
-<p>— The Odinbook team</p>
+<p style="margin:0 0 24px;">
+  <a href="<%= edit_profile_url %>"
+     style="display:inline-block;padding:12px 22px;border-radius:999px;background:#3b5bdb;color:#ffffff;font-weight:650;font-size:15px;text-decoration:none;">
+    Set up your profile
+  </a>
+</p>
+
+<p style="margin:0;font-size:14px;color:#6a7285;">
+  Or paste this into your browser:<br>
+  <a href="<%= edit_profile_url %>" style="color:#3b5bdb;"><%= edit_profile_url %></a>
+</p>

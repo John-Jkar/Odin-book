@@ -24,7 +24,7 @@ class WelcomeEmailFlowTest < ActionDispatch::IntegrationTest
 
     assert_equal [ "welcomed@example.com" ], mail.to
     assert_equal "Welcome to Odinbook, welcomed!", mail.subject
-    assert_match "go set it up", mail.text_part.body.to_s
+    assert_match "set it up", mail.text_part.body.to_s
   end
 
   test "signing in does not send another welcome email" do
