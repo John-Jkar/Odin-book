@@ -41,6 +41,29 @@ The front end is a hand-rolled design system in `app/assets/stylesheets/applicat
 
 Prerequisites: Ruby 3.3+ and a running PostgreSQL 14+.
 
+### Start PostgreSQL
+
+If you do not already have PostgreSQL running, a `docker-compose.yml` is provided. It publishes PostgreSQL on **5432** and uses the same credentials as `config/database.yml`, so no `PG*` variables need exporting:
+
+```bash
+docker compose up -d
+```
+
+Wait for it to report healthy, then continue:
+
+```bash
+docker compose ps
+```
+
+The data lives in a named volume, so `docker compose down` and `up` again keep your data. Use `docker compose down -v` to discard it.
+
+If port 5432 is already taken by another PostgreSQL (for example a native install), stop that one, or publish the container on a different port and tell Rails too:
+
+```bash
+PGPORT=5433 docker compose up -d
+PGPORT=5433 bin/setup
+```
+
 1. **Install dependencies**
 
    ```bash
@@ -111,7 +134,9 @@ psql -U postgres -d postgres -c "ALTER DATABASE postgres REFRESH COLLATION VERSI
 
 If those databases contain data, run `REINDEX DATABASE <name>` afterwards as the PostgreSQL documentation recommends.
 
-**`role "postgres" does not exist`** — the role named in step 2 does not exist on your server. Docker containers created with a different `POSTGRES_USER` will not have it; either create it or export `PGUSER`/`PGPASSWORD` to match what you have.
+**`role "postgres" does not exist`** — the role named in step 2 does not exist on your server. The provided `docker-compose.yml` creates it, but a container started some other way with a different `POSTGRES_USER` will not have it; either create the role or export `PGUSER`/`PGPASSWORD` to match what you have.
+
+**`port is already allocated`** (from `docker compose up`) — something else, often a native PostgreSQL, is already listening on 5432. Either stop it, or publish the container elsewhere with `PGPORT=5433 docker compose up -d` and export the same `PGPORT` for Rails.
 
 ## Verifying the build
 

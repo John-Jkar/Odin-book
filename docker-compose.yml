@@ -1,0 +1,41 @@
+# PostgreSQL for Odinbook.
+#
+#   docker compose up -d
+#   bin/setup
+#
+# Credentials match the defaults in config/database.yml and the CI workflow, so
+# no PG* environment variables need to be exported for local development.
+#
+# The container publishes on port 5432 by default. If something else already
+# uses 5432 on your machine (a native PostgreSQL install, for example), pick a
+# different host port and tell Rails about it:
+#
+#   PGPORT=5433 docker compose up -d
+#   PGPORT=5433 bin/setup
+#
+# The port on the right-hand side is always 5432: that is the port PostgreSQL
+# listens on inside the container.
+
+services:
+  db:
+    image: postgres:16
+    container_name: odinbook-pg
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "${PGPORT:-5432}:5432"
+    volumes:
+      # Named volume, so data survives `docker compose down` and container
+      # recreation. Use `docker compose down -v` to discard it.
+      - odinbook-pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  odinbook-pg-data:
