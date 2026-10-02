@@ -129,6 +129,9 @@ class SocialFlowTest < ApplicationSystemTestCase
     assert_selector "h1", text: "alice"
     click_link "Edit profile"
 
+    # Wait for the edit page itself. Navigating and filling immediately can
+    # race Turbo's render, filling a form that is then replaced.
+    assert_selector "h1", text: "Edit Profile"
     fill_in "Full name", with: "Alice A. Anderson"
     fill_in "Location", with: "Portland, Oregon"
     click_button "Save changes"
