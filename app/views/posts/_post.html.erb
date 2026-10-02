@@ -18,7 +18,15 @@
     <% end %>
   </header>
 
-  <p class="post-content"><%= post.content %></p>
+  <% if post.content.present? %>
+    <p class="post-content"><%= post.content %></p>
+  <% end %>
+
+  <% if post.image.attached? %>
+    <%= image_tag post.image,
+          class: "post-image",
+          alt: "Picture shared by #{post.user.username}" %>
+  <% end %>
 
   <div class="post-actions">
     <% if post.liked_by?(current_user) %>

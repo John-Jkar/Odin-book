@@ -4,7 +4,12 @@ class Post < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :likes, dependent: :destroy
 
-  validates :content, presence: true, length: { maximum: 280 }
+  has_one_attached :image
+
+  validates :content, length: { maximum: 280 }
+  # A picture on its own is a valid post, so text is only required when no
+  # image is attached.
+  validates :content, presence: true, unless: -> { image.attached? }
 
   scope :recent, -> { order(created_at: :desc) }
 

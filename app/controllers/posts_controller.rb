@@ -2,6 +2,7 @@ class PostsController < ApplicationController
   def index
     @post = Post.new
     @posts = Post.from_feed_of(current_user)
+      .with_attached_image
       .includes(:user, { comments: :user }, :likes)
   end
 
@@ -9,6 +10,7 @@ class PostsController < ApplicationController
   # discover people you don't already follow.
   def discover
     @posts = Post.from_discover_for(current_user)
+      .with_attached_image
       .includes(:user, { comments: :user }, :likes)
   end
 
@@ -19,6 +21,7 @@ class PostsController < ApplicationController
       redirect_to posts_path, notice: "Post created."
     else
       @posts = Post.from_feed_of(current_user)
+        .with_attached_image
         .includes(:user, { comments: :user }, :likes)
       render :index, status: :unprocessable_entity
     end
@@ -33,6 +36,6 @@ class PostsController < ApplicationController
   private
 
   def post_params
-    params.require(:post).permit(:content)
+    params.require(:post).permit(:content, :image)
   end
 end

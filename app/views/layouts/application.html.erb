@@ -55,7 +55,7 @@
       </nav>
     <% end %>
 
-    <main class="container">
+    <main class="<%= content_for?(:wide_layout) ? "page-wide" : "container" %>">
       <% if notice.present? %>
         <p class="flash flash-notice"><%= notice %></p>
       <% end %>

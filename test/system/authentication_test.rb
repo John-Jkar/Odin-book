@@ -1,6 +1,23 @@
 require "application_system_test_case"
 
 class AuthenticationTest < ApplicationSystemTestCase
+  test "visitors see the landing page" do
+    visit root_path
+
+    assert_selector ".landing-title"
+    assert_text "Share what's happening"
+    assert_link "Create your account"
+    assert_link "Log in"
+    assert_no_selector ".navbar"
+  end
+
+  test "signed in users are sent from the landing page to the feed" do
+    sign_in_as "alice"
+    visit root_path
+
+    assert_selector ".page-title", text: "Feed"
+  end
+
   test "a visitor can sign up and is taken to the feed" do
     visit root_path
     assert_text "Log in"

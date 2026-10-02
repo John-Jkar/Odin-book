@@ -1,0 +1,90 @@
+<% content_for :title, "Odinbook" %>
+<% content_for :wide_layout, true %>
+
+<div class="landing">
+  <header class="landing-nav">
+    <%= link_to root_path, class: "brand" do %>
+      <span class="brand-mark" aria-hidden="true">O</span>
+      <span>Odinbook</span>
+    <% end %>
+
+    <nav class="landing-nav-actions">
+      <%= link_to "Log in", new_user_session_path, class: "btn btn-ghost btn-small" %>
+      <%= link_to "Sign up", new_user_registration_path, class: "btn btn-small" %>
+    </nav>
+  </header>
+
+  <section class="landing-hero">
+    <div class="landing-hero-copy">
+      <p class="landing-eyebrow">A small social network</p>
+      <h1 class="landing-title">
+        Share what's happening. Follow who matters.
+      </h1>
+      <p class="landing-lede">
+        Odinbook is a Rails-built social feed. Post text and pictures, send
+        follow requests, and like or comment on what the people you follow
+        share.
+      </p>
+
+      <div class="landing-cta">
+        <%= link_to "Create your account", new_user_registration_path, class: "btn" %>
+        <%= link_to "Log in", new_user_session_path, class: "btn btn-ghost" %>
+      </div>
+    </div>
+
+    <div class="landing-visual" aria-hidden="true">
+      <div class="mock-card">
+        <div class="mock-head">
+          <span class="mock-avatar"></span>
+          <span class="mock-who">
+            <span class="mock-line w-40"></span>
+            <span class="mock-line w-24 subtle"></span>
+          </span>
+        </div>
+        <span class="mock-line w-90"></span>
+        <span class="mock-line w-70"></span>
+        <div class="mock-image"></div>
+        <div class="mock-actions">
+          <span class="mock-pill"></span>
+          <span class="mock-pill"></span>
+        </div>
+      </div>
+
+      <div class="mock-card mock-card-offset">
+        <div class="mock-head">
+          <span class="mock-avatar alt"></span>
+          <span class="mock-who">
+            <span class="mock-line w-32"></span>
+            <span class="mock-line w-20 subtle"></span>
+          </span>
+        </div>
+        <span class="mock-line w-80"></span>
+        <span class="mock-line w-50"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-features">
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">✎</div>
+      <h2>Post text or pictures</h2>
+      <p>Share a thought, or attach an image. A picture on its own is a post too.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">◎</div>
+      <h2>Follow people</h2>
+      <p>Send follow requests, accept the ones you want, and build your feed.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">♥</div>
+      <h2>Like and comment</h2>
+      <p>Join the conversation on any post, from your feed or For You.</p>
+    </article>
+  </section>
+
+  <footer class="landing-footer">
+    <p>Built with Ruby on Rails.</p>
+  </footer>
+</div>

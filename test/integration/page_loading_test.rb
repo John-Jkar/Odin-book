@@ -28,11 +28,21 @@ class PageLoadingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the root path loads" do
+  test "the root path sends signed in users to the feed" do
+    get root_path
+
+    assert_redirected_to posts_path
+  end
+
+  test "the landing page loads for signed out visitors" do
+    delete destroy_user_session_path
+
     get root_path
 
     assert_response :success
-    assert_select "h1", "Feed"
+    assert_select ".landing-title"
+    assert_select "a", text: "Log in"
+    assert_select "a", text: "Sign up"
   end
 
   test "the password reset page loads" do

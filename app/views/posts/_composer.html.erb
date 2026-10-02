@@ -21,8 +21,14 @@
                 placeholder: "Share something with your followers..." %>
         </div>
 
+        <div class="field">
+          <%= form.label :image, "Add a picture", class: "composer-file-label" %>
+          <%= form.file_field :image, accept: "image/*",
+                class: "composer-file" %>
+        </div>
+
         <div class="composer-footer">
-          <span class="composer-hint">Up to 280 characters</span>
+          <span class="composer-hint">Up to 280 characters, optional picture</span>
           <%= form.submit "Post", class: "btn" %>
         </div>
       </div>

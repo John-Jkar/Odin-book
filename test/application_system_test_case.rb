@@ -47,6 +47,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def sign_out
     click_button "Log out"
-    assert_selector ".auth-card", wait: 10
+    # Devise redirects to root, which is the landing page for signed out
+    # visitors.
+    assert_selector ".landing-title", wait: 10
   end
 end

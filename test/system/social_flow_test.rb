@@ -11,6 +11,17 @@ class SocialFlowTest < ApplicationSystemTestCase
     assert_selector ".flash-notice"
   end
 
+  test "a user can publish a post with a picture" do
+    sign_in_as "alice"
+
+    fill_in "What's on your mind?", with: "A picture from the system test."
+    attach_file "Add a picture", Rails.root.join("test/fixtures/files/sample.png")
+    click_button "Post"
+
+    assert_text "A picture from the system test."
+    assert_selector ".post-image", wait: 10
+  end
+
   test "the feed shows own and followed posts but not strangers" do
     sign_in_as "alice"
 

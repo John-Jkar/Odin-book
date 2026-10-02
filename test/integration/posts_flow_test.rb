@@ -123,7 +123,54 @@ class PostsFlowTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", users_path
   end
 
+  test "a user can create a post with a picture" do
+    assert_difference "Post.count", 1 do
+      post posts_path, params: {
+        post: { content: "With a picture.", image: uploaded_image }
+      }
+    end
+
+    assert_redirected_to posts_path
+    assert Post.recent.first.image.attached?
+  end
+
+  test "a post with only a picture and no text is allowed" do
+    assert_difference "Post.count", 1 do
+      post posts_path, params: { post: { content: "", image: uploaded_image } }
+    end
+
+    assert_redirected_to posts_path
+  end
+
+  test "an attached picture renders on the feed" do
+    post = Post.create!(user: users(:alice), content: "Picture post.")
+    post.image.attach(
+      io: file_fixture("sample.png").open,
+      filename: "sample.png",
+      content_type: "image/png"
+    )
+
+    get posts_path
+
+    assert_select ".post-image"
+  end
+
+  test "a post with neither text nor a picture is rejected" do
+    assert_no_difference "Post.count" do
+      post posts_path, params: { post: { content: "" } }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
   private
+
+  def uploaded_image
+    Rack::Test::UploadedFile.new(
+      Rails.root.join("test/fixtures/files/sample.png"),
+      "image/png"
+    )
+  end
 
   def sign_in_as(user)
     post user_session_path, params: {

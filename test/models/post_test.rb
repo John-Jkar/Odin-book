@@ -48,6 +48,39 @@ class PostTest < ActiveSupport::TestCase
     assert_includes post.errors[:content], "can't be blank"
   end
 
+  test "a post can have an attached image" do
+    assert_respond_to Post.new, :image
+  end
+
+  test "a post with only an image and no text is valid" do
+    post = Post.new(user: users(:alice))
+    post.image.attach(
+      io: file_fixture("sample.png").open,
+      filename: "sample.png",
+      content_type: "image/png"
+    )
+
+    assert post.valid?, post.errors.full_messages.inspect
+  end
+
+  test "a post with neither text nor an image is invalid" do
+    post = Post.new(user: users(:alice), content: "")
+
+    assert_not post.valid?
+    assert_includes post.errors[:content], "can't be blank"
+  end
+
+  test "content length is still capped when an image is attached" do
+    post = Post.new(user: users(:alice), content: "a" * 281)
+    post.image.attach(
+      io: file_fixture("sample.png").open,
+      filename: "sample.png",
+      content_type: "image/png"
+    )
+
+    assert_not post.valid?
+  end
+
   test "content length is capped" do
     post = Post.new(user: users(:alice), content: "a" * 281)
 
