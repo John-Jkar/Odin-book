@@ -1,5 +1,31 @@
 require "test_helper"
 
+# Chrome (seen on 154) sometimes reports an element that Turbo has since
+# replaced as an `UnknownError` from the `displayed?` atom:
+#
+#   unhandled inspector error: {"code"=>-32000,
+#     "message"=>"Node with given id does not belong to the document"}
+#
+# Capybara only retries the error classes listed in
+# `driver.invalid_element_errors`, which includes StaleElementReferenceError but
+# not the catch-all UnknownError. The retry loop therefore aborts the test
+# instead of re-querying. Translate that specific message into a stale reference
+# so Capybara handles it the way it handles any other element that went away
+# mid-render.
+module SeleniumStaleNodeWorkaround
+  STALE_MESSAGE = "does not belong to the document"
+
+  def displayed?
+    super
+  rescue Selenium::WebDriver::Error::UnknownError => e
+    raise Selenium::WebDriver::Error::StaleElementReferenceError, e.message if e.message.include?(STALE_MESSAGE)
+
+    raise
+  end
+end
+
+Selenium::WebDriver::Element.prepend(SeleniumStaleNodeWorkaround)
+
 # Capybara's default wait is 2s, which is tight for Turbo form submissions on a
 # loaded CI runner. These are timing-sensitive assertions about DOM state that
 # arrives asynchronously, so allow more headroom rather than assert instantly.
@@ -39,16 +65,19 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def sign_in_as(username, password: DEFAULT_PASSWORD)
     visit new_user_session_path
+    # Wait for the form before typing, so a late Turbo render cannot replace the
+    # inputs after they are filled.
+    assert_selector "#user_email"
     fill_in "Email", with: "#{username}@example.com"
     fill_in "Password", with: password
     click_button "Log in"
-    assert_selector ".navbar", wait: 10
+    assert_selector ".navbar"
   end
 
   def sign_out
     click_button "Log out"
     # Devise redirects to root, which is the landing page for signed out
     # visitors.
-    assert_selector ".landing-title", wait: 10
+    assert_selector ".landing-title"
   end
 end
