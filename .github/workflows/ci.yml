@@ -140,7 +140,19 @@ jobs:
           PGPASSWORD: postgres
           PGDATABASE: postgres
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/odinbook_test
-        run: bin/rails db:test:prepare test:system
+        run: |
+          bin/rails db:test:prepare test:system 2>&1 | tee /tmp/system-tests.log
+          exit ${PIPESTATUS[0]}
+
+      # Temporary diagnostic: surface the failure as an annotation so it can be
+      # read without downloading logs. Remove once the flake is understood.
+      - name: Report system test failure
+        if: failure()
+        run: |
+          if [ -f /tmp/system-tests.log ]; then
+            body=$(grep -A16 -E "^(Failure|Error):" /tmp/system-tests.log | head -70 | tr '\n' '|' | tr -d '\r')
+            echo "::error title=System test failure::${body}"
+          fi
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
